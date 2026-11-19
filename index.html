@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Pipeline Explorer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="app-header">
+        <div class="header-glow"></div>
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <h1>LLM PIPELINE EXPLORER</h1>
+            </div>
+            <p class="subtitle">Interactive AI Education Dashboard — Learn How LLMs Process Text</p>
+        </div>
+    </header>
+
+    <main class="app-main">
+
+        <!-- ============ INPUT SECTION ============ -->
+        <section class="card input-section">
+            <h2 class="section-title"><span class="title-icon">📝</span> Enter Your Text</h2>
+            <textarea id="input-text" placeholder="Type a sentence to explore the LLM pipeline..." rows="3"></textarea>
+            <div class="button-row">
+                <button id="btn-run" class="btn btn-primary">
+                    <span class="btn-icon">🚀</span> RUN PIPELINE
+                </button>
+                <button id="btn-reset" class="btn btn-secondary">
+                    <span class="btn-icon">🔄</span> Reset
+                </button>
+            </div>
+            <div class="examples-row">
+                <span class="examples-label">Try an example:</span>
+                <button class="btn btn-example" data-text="The cat sat on the mat">The cat sat on the mat</button>
+                <button class="btn btn-example" data-text="Machine learning models process natural language understanding">ML & Natural Language</button>
+                <button class="btn btn-example" data-text="I think therefore I am I exist">I think therefore I am</button>
+            </div>
+        </section>
+
+        <!-- ============ PIPELINE PROGRESS ============ -->
+        <div class="pipeline-track" id="pipeline-track">
+            <div class="pipeline-step" data-step="input">
+                <div class="step-node">1</div>
+                <span class="step-name">INPUT</span>
+            </div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step" data-step="vocabulary">
+                <div class="step-node">2</div>
+                <span class="step-name">VOCABULARY</span>
+            </div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step" data-step="tokenization">
+                <div class="step-node">3</div>
+                <span class="step-name">TOKENIZATION</span>
+            </div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step" data-step="characters">
+                <div class="step-node">4</div>
+                <span class="step-name">CHARACTERS</span>
+            </div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step" data-step="embeddings">
+                <div class="step-node">5</div>
+                <span class="step-name">EMBEDDINGS</span>
+            </div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step" data-step="graph">
+                <div class="step-node">6</div>
+                <span class="step-name">GRAPH</span>
+            </div>
+        </div>
+
+        <!-- ============ STATS BAR ============ -->
+        <div class="stats-bar" id="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-chars">0</div>
+                <div class="stat-label">Characters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-tokens">0</div>
+                <div class="stat-label">Total Tokens</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-vocab">0</div>
+                <div class="stat-label">Unique Vocab</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-subtokens">0</div>
+                <div class="stat-label">Subtokens</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-dimensions">0</div>
+                <div class="stat-label">Embed Dims</div>
+            </div>
+        </div>
+
+        <!-- ============ STAGE 1: VOCABULARY BUILDER ============ -->
+        <section class="card stage-section" id="stage-vocabulary">
+            <div class="stage-header">
+                <h2 class="section-title"><span class="title-icon">📚</span> Stage 1 — Vocabulary Builder</h2>
+                <div class="vocab-controls">
+                    <input type="text" id="vocab-search" class="search-input" placeholder="🔍 Search words...">
+                    <select id="vocab-sort" class="sort-select">
+                        <option value="appearance">Sort: Appearance</option>
+                        <option value="alpha">Sort: A → Z</option>
+                        <option value="freq-desc">Sort: Frequency ↓</option>
+                        <option value="freq-asc">Sort: Frequency ↑</option>
+                        <option value="id">Sort: Token ID</option>
+                    </select>
+                </div>
+            </div>
+            <div class="vocab-summary" id="vocab-summary"></div>
+            <div class="table-container">
+                <table class="vocab-table" id="vocab-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Word</th>
+                            <th>Token ID</th>
+                            <th>Frequency</th>
+                            <th>Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocab-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ============ STAGE 2: TOKENIZATION ============ -->
+        <section class="card stage-section" id="stage-tokenization">
+            <h2 class="section-title"><span class="title-icon">🔤</span> Stage 2 — Tokenization</h2>
+            <div class="tabs" id="token-tabs">
+                <button class="tab active" data-tab="word">Word Tokens</button>
+                <button class="tab" data-tab="subword">Subword Tokens</button>
+                <button class="tab" data-tab="character">Character Tokens</button>
+            </div>
+            <div class="token-banner" id="token-banner"></div>
+            <div class="original-display" id="original-display"></div>
+            <div class="tokens-grid" id="tokens-grid"></div>
+
+            <!-- Token Detail Panel -->
+            <div class="token-detail" id="token-detail">
+                <div class="detail-top">
+                    <h3>🔍 Token Detail</h3>
+                    <button class="btn-close" id="btn-close-detail">✕</button>
+                </div>
+                <div class="detail-body" id="detail-body"></div>
+            </div>
+        </section>
+
+        <!-- ============ STAGE 3: EMBEDDINGS ============ -->
+        <section class="card stage-section" id="stage-embeddings">
+            <h2 class="section-title"><span class="title-icon">🧠</span> Stage 3 — Embeddings</h2>
+
+            <div class="disclaimer-box">
+                <span class="disclaimer-icon">⚠️</span>
+                <p>These are <strong>demonstration embeddings</strong> generated from character patterns — <em>not</em> real pretrained model embeddings. Actual LLM embeddings (like those in GPT or BERT) are learned from billions of text examples and capture deep semantic meaning.</p>
+            </div>
+
+            <div class="embed-panels">
+                <div class="embed-panel">
+                    <h3 class="panel-title">Token Vectors <span class="dim-badge" id="dim-badge">8D</span></h3>
+                    <div class="vectors-list" id="vectors-list"></div>
+                </div>
+                <div class="embed-panel">
+                    <h3 class="panel-title">Vector Heatmap</h3>
+                    <div class="heatmap-box" id="heatmap-box"></div>
+                    <div class="heatmap-legend">
+                        <span>−1.0</span>
+                        <div class="legend-bar"></div>
+                        <span>+1.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2D GRAPH -->
+            <div class="graph-section">
+                <div class="graph-header">
+                    <h3 class="panel-title">📊 2D Token Similarity Graph</h3>
+                    <div class="graph-modes">
+                        <button class="btn btn-mode active" id="btn-mode-spelling" data-mode="spelling">📝 Spelling Similarity</button>
+                        <button class="btn btn-mode" id="btn-mode-meaning" data-mode="meaning">💡 Meaning Similarity</button>
+                    </div>
+                </div>
+                <div class="graph-description" id="graph-description"></div>
+                <div class="canvas-wrap" id="canvas-wrap">
+                    <canvas id="graph-canvas"></canvas>
+                    <div class="tooltip" id="graph-tooltip"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="app-footer">
+        <p>LLM Pipeline Explorer — Educational Demonstration | Not connected to any real LLM or API</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
